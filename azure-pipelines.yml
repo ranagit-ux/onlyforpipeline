@@ -7,15 +7,18 @@ trigger:
 - main
 pool: autopool
 stages:
-  - stage: 
+  - stage: terraformintallation
     jobs:
       - job: terraformintallation
         steps:
           - task: TerraformInstaller@1
             inputs:
               terraformVersion: 'latest'
+  - stage: terraforminit
+    dependsOn: terraformintallation
+    jobs:
       - job: Terraforminit
-        dependsOn: terraformintallation
+        
         steps:
           - task: TerraformTaskV4@4
             inputs:
@@ -33,8 +36,24 @@ stages:
               command: 'plan'
               workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
               environmentServiceNameAzureRM: 'autopool'
-          - task: TerraformTaskV4@4
-            inputs:
+  - stage: terraformapply
+    dependsOn: terraforminit
+    jobs: 
+    - job: terraformapply
+      steps: 
+      - task: TerraformTaskV4@4
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          backendServiceArm: 'autopool'
+          backendAzureRmResourceGroupName: 'forpipeline'
+          backendAzureRmStorageAccountName: 'mypipelinestorage'
+          backendAzureRmContainerName: 'pipelinecontainer'
+          backendAzureRmKey: 'terraform.tfstate'
+                     
+      - task: TerraformTaskV4@4
+        inputs:
               provider: 'azurerm'
               command: 'apply'
               workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
