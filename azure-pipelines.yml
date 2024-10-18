@@ -14,3 +14,15 @@ stages:
           - task: TerraformInstaller@1
             inputs:
               terraformVersion: 'latest'
+      - job: Terraforminit
+        steps:
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/ranagit-ux/onlyforpipeline'
+              backendServiceArm: 'autopool'
+              backendAzureRmResourceGroupName: 'forpipeline'
+              backendAzureRmStorageAccountName: 'mypipelinestorage'
+              backendAzureRmContainerName: 'pipelinecontainer'
+              backendAzureRmKey: 'terraform.tfstate'
