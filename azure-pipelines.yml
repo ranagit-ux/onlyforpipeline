@@ -27,6 +27,9 @@ stages:
               backendAzureRmStorageAccountName: 'mypipelinestorage'
               backendAzureRmContainerName: 'pipelinecontainer'
               backendAzureRmKey: 'terraform.tfstate'
+      - job: Terraformplan
+        dependsOn: Terraforminit
+        steps:
           - task: TerraformTaskV4@4
             inputs:
               provider: 'azurerm'
