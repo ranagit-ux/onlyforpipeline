@@ -22,7 +22,7 @@ stages:
               provider: 'azurerm'
               command: 'init'
               workingDirectory: '$(System.DefaultWorkingDirectory)/ranagit-ux/onlyforpipeline'
-              backendServiceArm: 'autopool'
+              backendServiceArm: 'Free Trial(b7d2b67b-62bb-4340-a048-868c00c1a9be)'
               backendAzureRmResourceGroupName: 'forpipeline'
               backendAzureRmStorageAccountName: 'mypipelinestorage'
               backendAzureRmContainerName: 'pipelinecontainer'
