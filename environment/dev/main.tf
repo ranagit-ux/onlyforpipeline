@@ -9,7 +9,7 @@ module "vnet" {
   vnetwork = var.vnet
 }
 module "subnet" {
-    depends_on = [ module.vnet,module.resource_grop ]
+ depends_on = [ module.vnet,module.resource_grop ]
   
   source = "../../module/subnet"
 subnet=var.snet
