@@ -3,7 +3,7 @@ data "azurerm_network_interface" "nic" {
   resource_group_name = "testrg"
 }
 
-resource "azurerm_linux_virtual_machine" "testvm" {
+resource "azurerm_windows_virtual_machine" "testvm" {
     name="testvm"
     location = "centralindia"
     resource_group_name = "testrg"
@@ -11,16 +11,16 @@ resource "azurerm_linux_virtual_machine" "testvm" {
     network_interface_ids = [data.azurerm_network_interface.nic.id]
     admin_username = "rana"
     admin_password = "rana@12345"
-    disable_password_authentication = false
+    
     
     os_disk {
       caching = "ReadWrite"
       storage_account_type = "Standard_LRS"
     }
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
+    source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
     version   = "latest"
   }
 }
