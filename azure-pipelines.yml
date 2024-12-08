@@ -13,7 +13,7 @@ stages:
       inputs:
         version: 'v1.26.0'
         dir: '$(System.DefaultWorkingDirectory)/environment/dev'
-  - job: teraforminitplan
+  - job: terraforminitplan
     steps:
     - task: TerraformTaskV4@4
       inputs:
