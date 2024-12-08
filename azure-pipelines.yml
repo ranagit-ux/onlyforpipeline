@@ -1,60 +1,64 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+
 name: infrapipeline
 trigger:
 - main
 pool: autopool
 stages:
-  - stage: terraformintallation
-    jobs:
-      - job: terraformintallation
-        steps:
-          - task: TerraformInstaller@1
-            inputs:
-              terraformVersion: 'latest'
-  - stage: terraforminit
-    dependsOn: terraformintallation
-    jobs:
-      - job: Terraforminit
-        
-        steps:
-          - task: TerraformTaskV4@4
-            inputs:
-              provider: 'azurerm'
-              command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
-              backendServiceArm: 'autopool'
-              backendAzureRmResourceGroupName: 'forpipeline'
-              backendAzureRmStorageAccountName: 'mypipelinestorage'
-              backendAzureRmContainerName: 'pipelinecontainer'
-              backendAzureRmKey: 'terraform.tfstate'
-          - task: TerraformTaskV4@4
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
-              environmentServiceNameAzureRM: 'autopool'
-  - stage: terraformapply
-    dependsOn: terraforminit
-    jobs: 
-    - job: terraformapply
-      steps: 
-      - task: TerraformTaskV4@4
-        inputs:
-          provider: 'azurerm'
-          command: 'init'
-          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
-          backendServiceArm: 'autopool'
-          backendAzureRmResourceGroupName: 'forpipeline'
-          backendAzureRmStorageAccountName: 'mypipelinestorage'
-          backendAzureRmContainerName: 'pipelinecontainer'
-          backendAzureRmKey: 'terraform.tfstate'
+- stage: terraforminitplan
+  displayName: terraform init plan
+  jobs:
+  - job: Sanitycheck
+    steps:
+    - task: tfsec@1
+      inputs:
+        version: 'v1.26.0'
+        dir: '$(System.DefaultWorkingDirectory)/environment/dev'
+  - job: teraforminitplan
+    steps:
+    - task: TerraformTaskV4@4
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        backendServiceArm: 'autopool'
+        backendAzureRmResourceGroupName: 'forpipeline'
+        backendAzureRmStorageAccountName: 'mypipelinestorage'
+        backendAzureRmContainerName: 'pipelinecontainer'
+        backendAzureRmKey: 'terraform.tfstate'
+    - task: TerraformTaskV4@4
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        environmentServiceNameAzureRM: 'autopool'
+- stage: terraformapply
+  dependsOn: terraforminitplan
+  jobs: 
+  
+  - job: manualValidation
+    pool: server
+    steps: 
+    - task: ManualValidation@1
+      inputs:
+        notifyUsers: 'pradeepsinghrana4567@gmail.com'
+        approvers: 'Pradeep'
+        allowApproversToApproveTheirOwnRuns: true
+  - job: terraformapply
+    steps:
+    - task: TerraformTaskV4@4
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        backendServiceArm: 'autopool'
+        backendAzureRmResourceGroupName: 'forpipeline'
+        backendAzureRmStorageAccountName: 'mypipelinestorage'
+        backendAzureRmContainerName: 'pipelinecontainer'
+        backendAzureRmKey: 'terraform.tfstate'
                      
-      - task: TerraformTaskV4@4
-        inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
-              environmentServiceNameAzureRM: 'autopool'
+    - task: TerraformTaskV4@4
+      inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          environmentServiceNameAzureRM: 'autopool'
