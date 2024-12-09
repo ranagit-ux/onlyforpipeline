@@ -32,9 +32,9 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
         environmentServiceNameAzureRM: 'autopool'
 - stage: terraformapply
+  displayName: terraformapply
   dependsOn: terraforminitplan
   jobs: 
-  
   - job: manualValidation
     pool: server
     steps: 
